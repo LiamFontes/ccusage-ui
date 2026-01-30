@@ -73,6 +73,11 @@ function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <TotalCostPanel
           totalCost={totals?.totalCost ?? 0}
+          modelBreakdowns={totals?.modelBreakdowns}
+          dailyCosts={dailyData?.daily?.map((d) => ({
+            date: d.date,
+            cost: d.totalCost,
+          }))}
           isLoading={isDailyLoading}
         />
         <TotalTokensPanel

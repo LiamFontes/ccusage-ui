@@ -18,7 +18,9 @@ export function formatCompactNumber(value: number): string {
   if (value >= 1_000) {
     return `${(value / 1_000).toFixed(1)}K`;
   }
-  return value.toString();
+  return new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 2,
+  }).format(value);
 }
 
 export function formatTokensPerMinute(value: number): string {
