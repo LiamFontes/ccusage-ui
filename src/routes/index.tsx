@@ -10,6 +10,7 @@ import { CostBreakdownChart } from '../components/charts/CostBreakdownChart';
 import { AccumulatedCostChart } from '../components/charts/AccumulatedCostChart';
 import { LastRefreshed } from '../components/LastRefreshed';
 import { calculateTotals } from '../server/ccusage.types';
+import { SESSION_COST_LIMIT } from '../lib/constants';
 
 export const Route = createFileRoute('/')({
   component: Dashboard,
@@ -32,6 +33,30 @@ function Dashboard() {
   const activeBlock = blocksData?.blocks.find((block) => block.isActive);
 
   const lastRefreshed = Math.max(dailyUpdatedAt, blocksUpdatedAt || 0);
+
+  // Calculate remaining minutes based on both time projection and cost limit
+  let remainingMinutes = activeBlock?.projection?.remainingMinutes;
+
+  if (
+    activeBlock &&
+    activeBlock.burnRate &&
+    activeBlock.burnRate.costPerHour > 0
+  ) {
+    const remainingBudget = Math.max(
+      0,
+      SESSION_COST_LIMIT - activeBlock.costUSD,
+    );
+    const costBasedRemainingMinutes =
+      (remainingBudget / activeBlock.burnRate.costPerHour) * 60;
+
+    // If we have a projection, take the minimum of time-based and cost-based
+    // Otherwise just use cost-based
+    if (remainingMinutes !== undefined) {
+      remainingMinutes = Math.min(remainingMinutes, costBasedRemainingMinutes);
+    } else {
+      remainingMinutes = costBasedRemainingMinutes;
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -61,7 +86,7 @@ function Dashboard() {
         />
         <BurnRatePanel
           burnRate={activeBlock?.burnRate}
-          remainingMinutes={activeBlock?.projection?.remainingMinutes}
+          remainingMinutes={remainingMinutes}
           isLoading={isBlocksLoading}
         />
       </div>
