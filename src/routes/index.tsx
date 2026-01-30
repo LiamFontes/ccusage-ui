@@ -92,6 +92,8 @@ function Dashboard() {
         <BurnRatePanel
           burnRate={activeBlock?.burnRate}
           remainingMinutes={remainingMinutes}
+          activeBlockCost={activeBlock?.costUSD}
+          activeBlockTokens={activeBlock?.totalTokens}
           isLoading={isBlocksLoading}
         />
       </div>
