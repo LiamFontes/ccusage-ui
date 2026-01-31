@@ -7,23 +7,28 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-} from 'recharts'
-import type { DailyEntry } from '../../server/ccusage.types'
-import { formatDate, formatCompactNumber } from '../../lib/formatters'
+} from 'recharts';
+import type { DailyEntry } from '../../server/ccusage.types';
+import { formatDate, formatCompactNumber } from '../../lib/formatters';
+import { useIsDark } from '../ThemeProvider';
 
 interface TokenUsageChartProps {
-  data: DailyEntry[]
-  isLoading?: boolean
+  data: DailyEntry[];
+  isLoading?: boolean;
 }
 
 export function TokenUsageChart({ data, isLoading }: TokenUsageChartProps) {
+  const isDark = useIsDark();
+
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 h-80">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Token Usage</h3>
-        <div className="animate-pulse bg-gray-200 rounded h-56" />
+      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 h-80">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+          Token Usage
+        </h3>
+        <div className="animate-pulse bg-gray-200 dark:bg-zinc-800 rounded h-56" />
       </div>
-    )
+    );
   }
 
   const chartData = data.map((entry) => ({
@@ -32,20 +37,39 @@ export function TokenUsageChart({ data, isLoading }: TokenUsageChartProps) {
     output: entry.outputTokens,
     cacheCreation: entry.cacheCreationTokens,
     cacheRead: entry.cacheReadTokens,
-  }))
+  }));
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Token Usage Over Time</h3>
+    <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
+      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+        Token Usage Over Time
+      </h3>
       <ResponsiveContainer width="100%" height={300}>
-        <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis tickFormatter={(value) => formatCompactNumber(value)} />
+        <AreaChart
+          data={chartData}
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke={isDark ? '#374151' : '#e5e7eb'}
+          />
+          <XAxis
+            dataKey="date"
+            tick={{ fill: isDark ? '#9ca3af' : '#6b7280' }}
+          />
+          <YAxis
+            tickFormatter={(value) => formatCompactNumber(value)}
+            tick={{ fill: isDark ? '#9ca3af' : '#6b7280' }}
+          />
           <Tooltip
-            formatter={(value: number) => formatCompactNumber(value)}
-            labelStyle={{ color: '#374151' }}
-            contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb' }}
+            formatter={(value: number | undefined) =>
+              formatCompactNumber(value ?? 0)
+            }
+            labelStyle={{ color: isDark ? '#d1d5db' : '#374151' }}
+            contentStyle={{
+              backgroundColor: isDark ? '#1f2937' : '#fff',
+              border: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+            }}
           />
           <Legend />
           <Area
@@ -83,5 +107,5 @@ export function TokenUsageChart({ data, isLoading }: TokenUsageChartProps) {
         </AreaChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }

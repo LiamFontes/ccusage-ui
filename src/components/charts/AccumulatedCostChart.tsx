@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import type { DailyEntry } from '../../server/ccusage.types';
 import { formatDate, formatCurrency } from '../../lib/formatters';
+import { useIsDark } from '../ThemeProvider';
 
 interface AccumulatedCostChartProps {
   data: DailyEntry[];
@@ -21,13 +22,15 @@ export function AccumulatedCostChart({
   data,
   isLoading,
 }: AccumulatedCostChartProps) {
+  const isDark = useIsDark();
+
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 h-80">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 h-80">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
           Accumulated Cost
         </h3>
-        <div className="animate-pulse bg-gray-200 rounded h-56" />
+        <div className="animate-pulse bg-gray-200 dark:bg-zinc-800 rounded h-56" />
       </div>
     );
   }
@@ -44,8 +47,8 @@ export function AccumulatedCostChart({
   });
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">
+    <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
+      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
         Cost Accumulation
       </h3>
       <ResponsiveContainer width="100%" height={300}>
@@ -53,15 +56,22 @@ export function AccumulatedCostChart({
           data={chartData}
           margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
         >
-          <CartesianGrid stroke="#f5f5f5" />
-          <XAxis dataKey="date" scale="band" />
-          <YAxis tickFormatter={(val) => formatCurrency(val)} />
+          <CartesianGrid stroke={isDark ? '#374151' : '#f5f5f5'} />
+          <XAxis
+            dataKey="date"
+            scale="band"
+            tick={{ fill: isDark ? '#9ca3af' : '#6b7280' }}
+          />
+          <YAxis
+            tickFormatter={(val) => formatCurrency(val)}
+            tick={{ fill: isDark ? '#9ca3af' : '#6b7280' }}
+          />
           <Tooltip
             formatter={(value: any) => formatCurrency(value)}
-            labelStyle={{ color: '#374151' }}
+            labelStyle={{ color: isDark ? '#d1d5db' : '#374151' }}
             contentStyle={{
-              backgroundColor: '#fff',
-              border: '1px solid #e5e7eb',
+              backgroundColor: isDark ? '#1f2937' : '#fff',
+              border: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
             }}
           />
           <Legend />

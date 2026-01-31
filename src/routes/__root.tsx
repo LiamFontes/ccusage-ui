@@ -1,9 +1,17 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { HeadContent, Outlet, Scripts, createRootRoute, Link } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRoute,
+  Link,
+} from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { TanStackDevtools } from '@tanstack/react-devtools';
 
-import appCss from '../styles.css?url'
+import { ThemeProvider } from '../components/ThemeProvider';
+import { ThemeToggle } from '../components/ThemeToggle';
+import appCss from '../styles.css?url';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -12,7 +20,7 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: true,
     },
   },
-})
+});
 
 export const Route = createRootRoute({
   head: () => ({
@@ -37,16 +45,18 @@ export const Route = createRootRoute({
   }),
 
   component: RootComponent,
-})
+});
 
 function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RootDocument>
-        <Outlet />
-      </RootDocument>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <RootDocument>
+          <Outlet />
+        </RootDocument>
+      </ThemeProvider>
     </QueryClientProvider>
-  )
+  );
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -55,40 +65,45 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="bg-gray-100 min-h-screen">
-        <nav className="bg-white shadow-sm border-b border-gray-200">
+      <body className="bg-gray-50 dark:bg-zinc-950 min-h-screen text-gray-900 dark:text-gray-50">
+        <nav className="bg-white dark:bg-zinc-900 shadow-sm border-b border-gray-200 dark:border-zinc-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex">
                 <div className="flex-shrink-0 flex items-center">
-                  <h1 className="text-xl font-bold text-gray-900">ccusage</h1>
+                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                    ccusage
+                  </h1>
                 </div>
                 <div className="hidden sm:ml-8 sm:flex sm:space-x-8">
                   <Link
                     to="/"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
                   >
                     Dashboard
                   </Link>
                   <Link
                     to="/daily"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
                   >
                     Daily
                   </Link>
                   <Link
                     to="/blocks"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
                   >
                     Blocks
                   </Link>
                   <Link
                     to="/sessions"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
                   >
                     Sessions
                   </Link>
                 </div>
+              </div>
+              <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                <ThemeToggle />
               </div>
             </div>
           </div>
@@ -110,5 +125,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }

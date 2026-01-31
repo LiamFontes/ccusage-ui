@@ -25,21 +25,23 @@ export function TotalCostPanel({
     .slice(0, 5);
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-sm font-medium text-gray-500">Total Cost</h3>
+    <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
+      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        Total Cost
+      </h3>
       {isLoading ? (
-        <div className="animate-pulse h-8 bg-gray-200 rounded mt-2 w-24" />
+        <div className="animate-pulse h-8 bg-gray-200 dark:bg-zinc-800 rounded mt-2 w-24" />
       ) : (
         <>
-          <p className="text-3xl font-bold text-gray-900 mt-2">
+          <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
             {formatCurrency(totalCost)}
           </p>
 
           {(topModels.length > 0 || recentDays.length > 0) && (
-            <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-6">
+            <div className="mt-6 pt-6 border-t border-gray-100 dark:border-zinc-800 flex flex-col gap-6">
               {topModels.length > 0 && (
                 <div className="space-y-3">
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     By Model
                   </h4>
                   <div className="space-y-2">
@@ -49,12 +51,12 @@ export function TotalCostPanel({
                         className="flex justify-between items-center text-sm"
                       >
                         <span
-                          className="text-gray-600 truncate mr-2"
+                          className="text-gray-600 dark:text-gray-400 truncate mr-2"
                           title={model.modelName}
                         >
                           {model.modelName}
                         </span>
-                        <span className="font-medium text-gray-900 whitespace-nowrap">
+                        <span className="font-medium text-gray-900 dark:text-gray-200 whitespace-nowrap">
                           {formatCurrency(model.cost)}
                         </span>
                       </div>
@@ -65,7 +67,7 @@ export function TotalCostPanel({
 
               {recentDays.length > 0 && (
                 <div className="space-y-3">
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     By Day
                   </h4>
                   <div className="space-y-2">
@@ -74,13 +76,13 @@ export function TotalCostPanel({
                         key={day.date}
                         className="flex justify-between items-center text-sm"
                       >
-                        <span className="text-gray-600">
+                        <span className="text-gray-600 dark:text-gray-400">
                           {new Date(day.date).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
                           })}
                         </span>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-gray-900 dark:text-gray-200">
                           {formatCurrency(day.cost)}
                         </span>
                       </div>
