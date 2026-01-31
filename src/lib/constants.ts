@@ -1,1 +1,1 @@
-export const SESSION_COST_LIMIT = 50.0;
+export const SESSION_COST_LIMIT = 5.62;
