@@ -86,13 +86,29 @@ export function BurnRatePanel({
             {formatCompactNumber(burnRate.tokensPerMinute * 60)}/hr
           </span>
         </div>
+      </div>
 
+      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            Quota Used
+          </span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {formatCurrency(activeBlockCost)} / {formatCurrency(5.0)}
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 dark:bg-zinc-700 rounded-full h-2.5">
+          <div
+            className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
+            style={{
+              width: `${Math.min((activeBlockCost / 5.0) * 100, 100)}%`,
+            }}
+          ></div>
+        </div>
         {remainingMinutes !== undefined && remainingMinutes > 0 && (
-          <div className="ml-4">
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-md border border-amber-100 dark:border-amber-900/30 whitespace-nowrap">
-              ~{formatCompactNumber(remainingMinutes)}m left
-            </p>
-          </div>
+          <p className="text-xs text-right mt-1 font-medium text-amber-600 dark:text-amber-400">
+            ~{formatCompactNumber(remainingMinutes)}m left
+          </p>
         )}
       </div>
     </div>

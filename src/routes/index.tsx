@@ -8,6 +8,7 @@ import { BurnRatePanel } from '../components/panels/BurnRatePanel';
 import { TokenUsageChart } from '../components/charts/TokenUsageChart';
 import { CostBreakdownChart } from '../components/charts/CostBreakdownChart';
 import { AccumulatedCostChart } from '../components/charts/AccumulatedCostChart';
+import { QuotaProjectionChart } from '../components/charts/QuotaProjectionChart';
 import { LastRefreshed } from '../components/LastRefreshed';
 import { calculateTotals } from '../server/ccusage.types';
 import { SESSION_COST_LIMIT } from '../lib/constants';
@@ -62,8 +63,10 @@ function Dashboard() {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-          <p className="text-gray-600 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Dashboard
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             Real-time Claude Code token usage and costs
           </p>
         </div>
@@ -110,6 +113,11 @@ function Dashboard() {
         <AccumulatedCostChart
           data={dailyData?.daily ?? []}
           isLoading={isDailyLoading}
+        />
+        <QuotaProjectionChart
+          activeBlock={activeBlock}
+          limit={SESSION_COST_LIMIT}
+          isLoading={isBlocksLoading}
         />
       </div>
 

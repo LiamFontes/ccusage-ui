@@ -25,7 +25,7 @@ export function LastRefreshed({ timestamp }: LastRefreshedProps) {
   if (!timestamp) return null;
 
   return (
-    <div className="flex items-center gap-1.5 text-xs text-gray-400">
+    <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-300">
       <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
       <span>Last updated {timeAgo}</span>
     </div>
