@@ -1,6 +1,7 @@
 import { Flame, Gauge, Info, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import type { BurnRate } from '../../server/ccusage.types';
 import { formatCompactNumber, formatCurrency } from '../../lib/formatters';
+import { SESSION_COST_LIMIT } from '../../lib/constants';
 
 interface BurnRatePanelProps {
   burnRate: BurnRate | null | undefined;
@@ -41,7 +42,7 @@ export function BurnRatePanel({
     );
   }
 
-  const quotaLimit = 5.0;
+  const quotaLimit = SESSION_COST_LIMIT;
   const quotaPercent = Math.min((activeBlockCost / quotaLimit) * 100, 100);
 
   let statusColor = 'bg-blue-500';

@@ -51,8 +51,8 @@ function Dashboard() {
     const costBasedRemainingMinutes =
       (remainingBudget / activeBlock.burnRate.costPerHour) * 60;
 
-    // If we have a projection, take the minimum of time-based and cost-based
-    // Otherwise just use cost-based
+    // Use cost-based limit if we don't have a backend projection,
+    // or if the cost-based limit is MORE restrictive (safety fallback)
     if (remainingMinutes !== undefined) {
       remainingMinutes = Math.min(remainingMinutes, costBasedRemainingMinutes);
     } else {
