@@ -8,6 +8,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Area,
 } from 'recharts';
 import type { DailyEntry } from '../../server/ccusage.types';
 import { formatDate, formatCurrency } from '../../lib/formatters';
@@ -26,11 +27,11 @@ export function AccumulatedCostChart({
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 h-80">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-          Accumulated Cost
+      <div className="card-premium p-6 h-[400px]">
+        <h3 className="text-sm font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-6">
+          Cost Accumulation
         </h3>
-        <div className="animate-pulse bg-gray-200 dark:bg-zinc-800 rounded h-56" />
+        <div className="animate-pulse bg-gray-100 dark:bg-zinc-800/50 rounded-lg h-[280px]" />
       </div>
     );
   }
@@ -47,48 +48,122 @@ export function AccumulatedCostChart({
   });
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+    <div className="card-premium p-6">
+      <h3 className="text-sm font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-6">
         Cost Accumulation
       </h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <ComposedChart
-          data={chartData}
-          margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-        >
-          <CartesianGrid stroke={isDark ? '#374151' : '#f5f5f5'} />
-          <XAxis
-            dataKey="date"
-            scale="band"
-            tick={{ fill: isDark ? '#9ca3af' : '#6b7280' }}
-          />
-          <YAxis
-            tickFormatter={(val) => formatCurrency(val)}
-            tick={{ fill: isDark ? '#9ca3af' : '#6b7280' }}
-          />
-          <Tooltip
-            formatter={(value: any) => formatCurrency(value)}
-            labelStyle={{ color: isDark ? '#d1d5db' : '#374151' }}
-            contentStyle={{
-              backgroundColor: isDark ? '#1f2937' : '#fff',
-              border: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
-            }}
-          />
-          <Legend />
-          <Bar
-            dataKey="dailyCost"
-            barSize={20}
-            fill="#3b82f6"
-            name="Daily Cost"
-          />
-          <Line
-            type="monotone"
-            dataKey="accumulatedCost"
-            stroke="#ef4444"
-            name="Accumulated Cost"
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
+      <div className="h-[300px] sm:h-[350px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart
+            data={chartData}
+            margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
+          >
+            <defs>
+              <linearGradient
+                id="accumulatedGradient"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+                  offset="5%"
+                  stopColor={isDark ? '#ef4444' : '#ef4444'}
+                  stopOpacity={0.1}
+                />
+                <stop
+                  offset="95%"
+                  stopColor={isDark ? '#ef4444' : '#ef4444'}
+                  stopOpacity={0}
+                />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke={isDark ? '#27272a' : '#f1f5f9'}
+            />
+            <XAxis
+              dataKey="date"
+              axisLine={false}
+              tickLine={false}
+              tick={{
+                fill: isDark ? '#71717a' : '#94a3b8',
+                fontSize: 10,
+                fontWeight: 600,
+              }}
+              dy={10}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={(val) => `$${val}`}
+              tick={{
+                fill: isDark ? '#71717a' : '#94a3b8',
+                fontSize: 10,
+                fontWeight: 600,
+              }}
+            />
+            <Tooltip
+              cursor={{
+                fill: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+              }}
+              contentStyle={{
+                backgroundColor: isDark ? '#18181b' : '#fff',
+                border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+                borderRadius: '8px',
+                padding: '12px',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                fontSize: '12px',
+                fontWeight: 'bold',
+              }}
+              itemStyle={{
+                padding: '2px 0',
+                color: isDark ? '#f4f4f5' : '#18181b',
+              }}
+              labelStyle={{
+                color: isDark ? '#a1a1aa' : '#71717a',
+                marginBottom: '4px',
+              }}
+              formatter={(value: any) => formatCurrency(value)}
+            />
+            <Legend
+              verticalAlign="top"
+              align="right"
+              iconType="circle"
+              wrapperStyle={{
+                paddingBottom: '20px',
+                fontSize: '10px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="accumulatedCost"
+              stroke="none"
+              fillOpacity={1}
+              fill="url(#accumulatedGradient)"
+            />
+            <Bar
+              dataKey="dailyCost"
+              barSize={12}
+              fill={isDark ? '#3b82f6' : '#2563eb'}
+              radius={[4, 4, 0, 0]}
+              name="Daily Spend"
+            />
+            <Line
+              type="monotone"
+              dataKey="accumulatedCost"
+              stroke={isDark ? '#ef4444' : '#dc2626'}
+              strokeWidth={3}
+              dot={{ r: 0 }}
+              activeDot={{ r: 6, strokeWidth: 0 }}
+              name="Accumulated"
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

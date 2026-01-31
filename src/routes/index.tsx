@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { DollarSign, Activity, Calendar, Zap } from 'lucide-react';
 import { useCcusageDaily } from '../hooks/useCcusageDaily';
 import { useCcusageBlocks } from '../hooks/useCcusageBlocks';
 import { TotalCostPanel } from '../components/panels/TotalCostPanel';
@@ -59,11 +60,14 @@ function Dashboard() {
     }
   }
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayEntry = dailyData?.daily?.find((d) => d.date === todayStr);
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-start">
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
             Dashboard
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
@@ -73,72 +77,117 @@ function Dashboard() {
         <LastRefreshed timestamp={lastRefreshed} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <TotalCostPanel
-          totalCost={totals?.totalCost ?? 0}
-          modelBreakdowns={totals?.modelBreakdowns}
-          dailyCosts={dailyData?.daily?.map((d) => ({
-            date: d.date,
-            cost: d.totalCost,
-          }))}
-          isLoading={isDailyLoading}
-        />
-        <TotalTokensPanel
-          totalTokens={totals?.totalTokens ?? 0}
-          modelBreakdowns={totals?.modelBreakdowns}
-          isLoading={isDailyLoading}
-        />
-        <ActiveBlockPanel
-          activeBlock={activeBlock}
-          isLoading={isBlocksLoading}
-        />
-        <BurnRatePanel
-          burnRate={activeBlock?.burnRate}
-          remainingMinutes={remainingMinutes}
-          activeBlockCost={activeBlock?.costUSD}
-          activeBlockTokens={activeBlock?.totalTokens}
-          isLoading={isBlocksLoading}
-        />
+      {/* Summary Stats Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          {
+            label: "Today's Spend",
+            value: `$${todayEntry?.totalCost.toFixed(2) ?? '0.00'}`,
+            icon: <DollarSign size={14} className="text-blue-500" />,
+            trend: todayEntry?.totalCost ? 'Live' : 'Idle',
+          },
+          {
+            label: 'Active Sessions',
+            value: activeBlock ? '1' : '0',
+            icon: <Activity size={14} className="text-green-500" />,
+            trend: activeBlock ? 'Monitoring' : 'None',
+          },
+          {
+            label: 'Days in Period',
+            value: dailyData?.daily?.length ?? 0,
+            icon: <Calendar size={14} className="text-purple-500" />,
+            trend: 'Current Cycle',
+          },
+          {
+            label: 'Cycle Status',
+            value: 'Active',
+            icon: <Zap size={14} className="text-amber-500" />,
+            trend: 'Standard',
+          },
+        ].map((stat, i) => (
+          <div
+            key={i}
+            className="card-premium p-4 flex flex-col justify-between"
+          >
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-[10px] font-black text-gray-400 dark:text-zinc-500 uppercase tracking-widest">
+                {stat.label}
+              </span>
+              <div className="p-1.5 bg-gray-50 dark:bg-zinc-800 rounded-lg">
+                {stat.icon}
+              </div>
+            </div>
+            <div>
+              <p className="text-2xl font-black text-gray-900 dark:text-white">
+                {stat.value}
+              </p>
+              <p className="text-[10px] font-bold text-gray-400 dark:text-zinc-600 uppercase mt-1">
+                {stat.trend}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TokenUsageChart
-          data={dailyData?.daily ?? []}
-          isLoading={isDailyLoading}
-        />
-        <CostBreakdownChart
-          data={dailyData?.daily ?? []}
-          isLoading={isDailyLoading}
-        />
-        <AccumulatedCostChart
-          data={dailyData?.daily ?? []}
-          isLoading={isDailyLoading}
-        />
-        <QuotaProjectionChart
-          activeBlock={activeBlock}
-          limit={SESSION_COST_LIMIT}
-          isLoading={isBlocksLoading}
-        />
-      </div>
-
-      {activeBlock?.projection && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <h3 className="font-medium text-amber-800">
-            Active Block Projection
-          </h3>
-          <p className="text-amber-700 mt-1">
-            At the current rate, this block will use approximately{' '}
-            <span className="font-semibold">
-              {activeBlock.projection.totalTokens.toLocaleString()} tokens
-            </span>{' '}
-            and cost{' '}
-            <span className="font-semibold">
-              ${activeBlock.projection.totalCost.toFixed(2)}
-            </span>{' '}
-            by the time it ends.
-          </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="min-h-[280px]">
+          <TotalCostPanel
+            totalCost={totals?.totalCost ?? 0}
+            modelBreakdowns={totals?.modelBreakdowns}
+            dailyCosts={dailyData?.daily?.map((d) => ({
+              date: d.date,
+              cost: d.totalCost,
+            }))}
+            isLoading={isDailyLoading}
+          />
         </div>
-      )}
+        <div className="min-h-[280px]">
+          <TotalTokensPanel
+            totalTokens={totals?.totalTokens ?? 0}
+            modelBreakdowns={totals?.modelBreakdowns}
+            isLoading={isDailyLoading}
+          />
+        </div>
+        <div className="min-h-[280px]">
+          <ActiveBlockPanel
+            activeBlock={activeBlock}
+            isLoading={isBlocksLoading}
+          />
+        </div>
+        <div className="min-h-[280px]">
+          <BurnRatePanel
+            burnRate={activeBlock?.burnRate}
+            remainingMinutes={remainingMinutes}
+            activeBlockCost={activeBlock?.costUSD}
+            activeBlockTokens={activeBlock?.totalTokens}
+            isLoading={isBlocksLoading}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <TokenUsageChart
+            data={dailyData?.daily ?? []}
+            isLoading={isDailyLoading}
+          />
+          <AccumulatedCostChart
+            data={dailyData?.daily ?? []}
+            isLoading={isDailyLoading}
+          />
+        </div>
+        <div className="space-y-6">
+          <CostBreakdownChart
+            data={dailyData?.daily ?? []}
+            isLoading={isDailyLoading}
+          />
+          <QuotaProjectionChart
+            activeBlock={activeBlock}
+            limit={SESSION_COST_LIMIT}
+            isLoading={isBlocksLoading}
+          />
+        </div>
+      </div>
     </div>
   );
 }

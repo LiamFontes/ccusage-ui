@@ -11,6 +11,12 @@ import { TanStackDevtools } from '@tanstack/react-devtools';
 
 import { ThemeProvider } from '../components/ThemeProvider';
 import { ThemeToggle } from '../components/ThemeToggle';
+import {
+  LayoutDashboard,
+  Calendar,
+  Box,
+  History as HistoryIcon,
+} from 'lucide-react';
 import appCss from '../styles.css?url';
 
 const queryClient = new QueryClient({
@@ -78,26 +84,30 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <div className="hidden sm:ml-8 sm:flex sm:space-x-8">
                   <Link
                     to="/"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
+                    className="inline-flex items-center px-1 pt-1 border-b-2 text-base font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 gap-2"
                   >
+                    <LayoutDashboard size={18} />
                     Dashboard
                   </Link>
                   <Link
                     to="/daily"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
+                    className="inline-flex items-center px-1 pt-1 border-b-2 text-base font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 gap-2"
                   >
+                    <Calendar size={18} />
                     Daily
                   </Link>
                   <Link
                     to="/blocks"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
+                    className="inline-flex items-center px-1 pt-1 border-b-2 text-base font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 gap-2"
                   >
+                    <Box size={18} />
                     Blocks
                   </Link>
                   <Link
                     to="/sessions"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
+                    className="inline-flex items-center px-1 pt-1 border-b-2 text-base font-medium [&.active]:border-blue-500 [&.active]:text-gray-900 dark:[&.active]:text-white border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 gap-2"
                   >
+                    <HistoryIcon size={18} />
                     Sessions
                   </Link>
                 </div>

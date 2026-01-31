@@ -28,17 +28,26 @@ export function QuotaProjectionChart({
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 h-80">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+      <div className="card-premium p-6 h-[400px]">
+        <h3 className="text-sm font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-6">
           Quota Projection
         </h3>
-        <div className="animate-pulse bg-gray-200 dark:bg-zinc-800 rounded h-56" />
+        <div className="animate-pulse bg-gray-100 dark:bg-zinc-800/50 rounded-lg h-[280px]" />
       </div>
     );
   }
 
   if (!activeBlock || !activeBlock.burnRate) {
-    return null;
+    return (
+      <div className="card-premium p-6 h-[400px] flex flex-col">
+        <h3 className="text-sm font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-6">
+          Quota Projection
+        </h3>
+        <div className="flex-grow flex items-center justify-center text-gray-400 dark:text-zinc-600 font-medium">
+          No active session to project
+        </div>
+      </div>
+    );
   }
 
   const startTime = new Date(activeBlock.startTime).getTime();
@@ -46,31 +55,24 @@ export function QuotaProjectionChart({
   const currentCost = activeBlock.costUSD;
   const costPerHour = activeBlock.burnRate.costPerHour;
 
-  // Calculate projected time to hit limit
-  // limit = currentCost + (costPerMs * msRemaining)
-  // msRemaining = (limit - currentCost) / costPerMs
   const costPerMs = costPerHour / (60 * 60 * 1000);
   const msRemaining = (limit - currentCost) / costPerMs;
-  const projectedEndTime = now + msRemaining;
+  const projectedEndTime = now + Math.max(0, msRemaining); // Ensure non-negative
 
   const data = [
     {
       time: startTime,
       actualCost: 0,
       projectedCost: 0,
-      label: 'Start',
     },
     {
       time: now,
       actualCost: currentCost,
       projectedCost: currentCost,
-      label: 'Now',
     },
     {
       time: projectedEndTime,
-      // actualCost: null, // Don't plot actual past now
       projectedCost: limit,
-      label: 'Limit',
     },
   ];
 
@@ -82,71 +84,101 @@ export function QuotaProjectionChart({
   };
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+    <div className="card-premium p-6">
+      <h3 className="text-sm font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-6">
         Quota Projection
       </h3>
-      <div className="h-[300px] w-full">
+      <div className="h-[300px] sm:h-[350px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={data}
-            margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
+            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
           >
+            <defs>
+              <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
+                <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke={isDark ? '#374151' : '#e5e7eb'}
+              vertical={false}
+              stroke={isDark ? '#27272a' : '#f1f5f9'}
             />
             <XAxis
               dataKey="time"
               type="number"
               domain={['dataMin', 'dataMax']}
+              axisLine={false}
+              tickLine={false}
               tickFormatter={formatTimeKey}
-              tick={{ fill: isDark ? '#9ca3af' : '#6b7280' }}
+              tick={{
+                fill: isDark ? '#71717a' : '#94a3b8',
+                fontSize: 10,
+                fontWeight: 600,
+              }}
+              dy={10}
             />
             <YAxis
-              tickFormatter={(value) => formatCurrency(value)}
-              domain={[0, Math.max(limit * 1.1, currentCost * 1.1)]} // Add some headroom
-              tick={{ fill: isDark ? '#9ca3af' : '#6b7280' }}
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={(value) => `$${value}`}
+              domain={[0, Math.max(limit * 1.1, currentCost * 1.1)]}
+              tick={{
+                fill: isDark ? '#71717a' : '#94a3b8',
+                fontSize: 10,
+                fontWeight: 600,
+              }}
             />
             <Tooltip
               labelFormatter={(value) => formatTimeKey(value as number)}
-              formatter={(value: number | undefined) =>
-                formatCurrency(value ?? 0)
-              }
               contentStyle={{
-                backgroundColor: isDark ? '#1f2937' : '#fff',
-                border: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
-                color: isDark ? '#f3f4f6' : '#111827',
+                backgroundColor: isDark ? '#18181b' : '#fff',
+                border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+                borderRadius: '8px',
+                padding: '12px',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                fontSize: '12px',
+                fontWeight: 'bold',
               }}
+              itemStyle={{ color: isDark ? '#f4f4f5' : '#18181b' }}
+              labelStyle={{
+                color: isDark ? '#a1a1aa' : '#71717a',
+                marginBottom: '4px',
+              }}
+              formatter={(value: any) => formatCurrency(value ?? 0)}
             />
             <ReferenceLine
               y={limit}
+              stroke={isDark ? '#ef4444' : '#ef4444'}
+              strokeWidth={1}
+              strokeDasharray="4 4"
               label={{
-                value: 'Limit',
-                fill: isDark ? '#ef4444' : '#dc2626',
-                position: 'insideTopRight',
+                value: `LIMIT (${formatCurrency(limit)})`,
+                fill: isDark ? '#f87171' : '#ef4444',
+                position: 'insideBottomRight',
+                fontSize: 10,
+                fontWeight: 800,
+                dy: -10,
               }}
-              stroke={isDark ? '#ef4444' : '#dc2626'}
-              strokeDasharray="3 3"
             />
             <Area
               type="monotone"
               dataKey="actualCost"
               stroke="#3b82f6"
-              fill="#3b82f6"
-              fillOpacity={0.2}
-              strokeWidth={2}
+              strokeWidth={3}
+              fill="url(#actualGradient)"
               connectNulls
-              name="Actual Cost"
+              name="Actual Spend"
             />
             <Line
               type="monotone"
               dataKey="projectedCost"
-              stroke="#9ca3af"
-              strokeDasharray="5 5"
+              stroke={isDark ? '#71717a' : '#94a3b8'}
+              strokeDasharray="6 6"
               strokeWidth={2}
               dot={false}
-              name="Projected"
+              name="Projection"
             />
           </ComposedChart>
         </ResponsiveContainer>

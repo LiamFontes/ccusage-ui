@@ -16,12 +16,12 @@ interface CostBreakdownChartProps {
 }
 
 const COLORS = [
-  '#3b82f6',
-  '#10b981',
-  '#f59e0b',
-  '#ef4444',
-  '#8b5cf6',
-  '#ec4899',
+  '#3b82f6', // blue
+  '#8b5cf6', // violet
+  '#06b6d4', // cyan
+  '#10b981', // emerald
+  '#f59e0b', // amber
+  '#ef4444', // red
 ];
 
 export function CostBreakdownChart({
@@ -32,11 +32,11 @@ export function CostBreakdownChart({
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 h-80">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+      <div className="card-premium p-6 h-[400px]">
+        <h3 className="text-sm font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-6">
           Cost by Model
         </h3>
-        <div className="animate-pulse bg-gray-200 dark:bg-zinc-800 rounded h-56" />
+        <div className="animate-pulse bg-gray-100 dark:bg-zinc-800/50 rounded-full h-56 w-56 mx-auto" />
       </div>
     );
   }
@@ -55,11 +55,11 @@ export function CostBreakdownChart({
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 h-80">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+      <div className="card-premium p-6 h-[400px] flex flex-col">
+        <h3 className="text-sm font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-6">
           Cost by Model
         </h3>
-        <div className="flex items-center justify-center h-56 text-gray-400 dark:text-gray-500">
+        <div className="flex-grow flex items-center justify-center text-gray-400 dark:text-zinc-600 font-medium">
           No data available
         </div>
       </div>
@@ -67,47 +67,60 @@ export function CostBreakdownChart({
   }
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+    <div className="card-premium p-6">
+      <h3 className="text-sm font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-6">
         Cost by Model
       </h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <PieChart>
-          <Pie
-            data={chartData}
-            cx="50%"
-            cy="50%"
-            innerRadius={60}
-            outerRadius={100}
-            fill="#8884d8"
-            paddingAngle={2}
-            dataKey="value"
-            label={({ name, percent }) =>
-              `${name} (${((percent || 0) * 100).toFixed(0)}%)`
-            }
-            labelLine={{ stroke: isDark ? '#9ca3af' : '#6b7280' }}
-          >
-            {chartData.map((_, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-                stroke={isDark ? '#1f2937' : '#fff'}
-              />
-            ))}
-          </Pie>
-          <Tooltip
-            formatter={(value: number | undefined) =>
-              formatCurrency(value ?? 0)
-            }
-            contentStyle={{
-              backgroundColor: isDark ? '#1f2937' : '#fff',
-              border: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
-            }}
-            itemStyle={{ color: isDark ? '#d1d5db' : '#374151' }}
-          />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
+      <div className="h-[300px] sm:h-[350px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={70}
+              outerRadius={100}
+              paddingAngle={5}
+              dataKey="value"
+              animationBegin={0}
+              animationDuration={1500}
+            >
+              {chartData.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                  stroke={isDark ? '#18181b' : '#fff'}
+                  strokeWidth={2}
+                />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: isDark ? '#18181b' : '#fff',
+                border: isDark ? '1px solid #27272a' : '1px solid #e2e8f0',
+                borderRadius: '8px',
+                padding: '12px',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                fontSize: '12px',
+                fontWeight: 'bold',
+              }}
+              itemStyle={{ color: isDark ? '#f4f4f5' : '#18181b' }}
+              formatter={(value: any) => formatCurrency(value ?? 0)}
+            />
+            <Legend
+              verticalAlign="bottom"
+              align="center"
+              iconType="circle"
+              wrapperStyle={{
+                paddingTop: '20px',
+                fontSize: '10px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
