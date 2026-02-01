@@ -12,7 +12,7 @@ import { AccumulatedCostChart } from '../components/charts/AccumulatedCostChart'
 import { QuotaProjectionChart } from '../components/charts/QuotaProjectionChart';
 import { LastRefreshed } from '../components/LastRefreshed';
 import { calculateTotals } from '../server/ccusage.types';
-import { SESSION_COST_LIMIT } from '../lib/constants';
+import { SESSION_COST_LIMIT, getWeekStartDate } from '../lib/constants';
 
 export const Route = createFileRoute('/')({
   component: Dashboard,
@@ -33,6 +33,24 @@ function Dashboard() {
 
   const totals = dailyData?.daily ? calculateTotals(dailyData.daily) : null;
   const activeBlock = blocksData?.blocks.find((block) => block.isActive);
+
+  // Calculate weekly cost (only entries from current week - since last Sunday 9 AM ET)
+  const calculateWeeklyCost = (): number => {
+    if (!dailyData?.daily) return 0;
+
+    const weekStart = getWeekStartDate();
+    // Format as YYYY-MM-DD for comparison with daily entry dates
+    const weekStartStr = weekStart.toISOString().split('T')[0];
+
+    return dailyData.daily
+      .filter((entry) => {
+        // Compare date strings directly to avoid timezone issues
+        return entry.date >= weekStartStr;
+      })
+      .reduce((sum, entry) => sum + entry.totalCost, 0);
+  };
+
+  const weeklyCost = calculateWeeklyCost();
 
   const lastRefreshed = Math.max(dailyUpdatedAt, blocksUpdatedAt || 0);
 
@@ -160,6 +178,7 @@ function Dashboard() {
             remainingMinutes={remainingMinutes}
             activeBlockCost={activeBlock?.costUSD}
             activeBlockTokens={activeBlock?.totalTokens}
+            totalWeeklyCost={weeklyCost}
             isLoading={isBlocksLoading}
           />
         </div>

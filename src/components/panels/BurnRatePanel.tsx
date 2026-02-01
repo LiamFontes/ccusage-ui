@@ -1,13 +1,25 @@
-import { Flame, Gauge, Info, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import {
+  Flame,
+  Gauge,
+  Info,
+  AlertTriangle,
+  CheckCircle2,
+  Calendar,
+} from 'lucide-react';
 import type { BurnRate } from '../../server/ccusage.types';
 import { formatCompactNumber, formatCurrency } from '../../lib/formatters';
-import { SESSION_COST_LIMIT } from '../../lib/constants';
+import {
+  SESSION_COST_LIMIT,
+  WEEKLY_COST_LIMIT,
+  getDaysUntilSunday,
+} from '../../lib/constants';
 
 interface BurnRatePanelProps {
   burnRate: BurnRate | null | undefined;
   remainingMinutes?: number;
   activeBlockCost?: number;
   activeBlockTokens?: number;
+  totalWeeklyCost?: number;
   isLoading?: boolean;
 }
 
@@ -15,6 +27,7 @@ export function BurnRatePanel({
   burnRate,
   remainingMinutes,
   activeBlockCost = 0,
+  totalWeeklyCost = 0,
   isLoading,
 }: BurnRatePanelProps) {
   if (isLoading) {
@@ -42,25 +55,52 @@ export function BurnRatePanel({
     );
   }
 
-  const quotaLimit = SESSION_COST_LIMIT;
-  const quotaPercent = Math.min((activeBlockCost / quotaLimit) * 100, 100);
+  const sessionQuotaPercent = Math.min(
+    (activeBlockCost / SESSION_COST_LIMIT) * 100,
+    100,
+  );
+  const weeklyQuotaPercent = Math.min(
+    (totalWeeklyCost / WEEKLY_COST_LIMIT) * 100,
+    100,
+  );
+  const daysUntilReset = getDaysUntilSunday();
 
-  let statusColor = 'bg-blue-500';
-  let textColor = 'text-blue-600 dark:text-blue-400';
-  let Icon = Info;
+  // Determine status color for session quota
+  let sessionStatusColor = 'bg-blue-500';
+  let sessionTextColor = 'text-blue-600 dark:text-blue-400';
+  let SessionIcon = Info;
 
-  if (quotaPercent > 80) {
-    statusColor = 'bg-red-500';
-    textColor = 'text-red-600 dark:text-red-400';
-    Icon = AlertTriangle;
-  } else if (quotaPercent > 50) {
-    statusColor = 'bg-amber-500';
-    textColor = 'text-amber-600 dark:text-amber-400';
-    Icon = Info;
-  } else if (quotaPercent > 0) {
-    statusColor = 'bg-green-500';
-    textColor = 'text-green-600 dark:text-green-400';
-    Icon = CheckCircle2;
+  if (sessionQuotaPercent > 80) {
+    sessionStatusColor = 'bg-red-500';
+    sessionTextColor = 'text-red-600 dark:text-red-400';
+    SessionIcon = AlertTriangle;
+  } else if (sessionQuotaPercent > 50) {
+    sessionStatusColor = 'bg-amber-500';
+    sessionTextColor = 'text-amber-600 dark:text-amber-400';
+    SessionIcon = Info;
+  } else if (sessionQuotaPercent > 0) {
+    sessionStatusColor = 'bg-green-500';
+    sessionTextColor = 'text-green-600 dark:text-green-400';
+    SessionIcon = CheckCircle2;
+  }
+
+  // Determine status color for weekly quota
+  let weeklyStatusColor = 'bg-blue-500';
+  let weeklyTextColor = 'text-blue-600 dark:text-blue-400';
+  let WeeklyIcon = Info;
+
+  if (weeklyQuotaPercent > 80) {
+    weeklyStatusColor = 'bg-red-500';
+    weeklyTextColor = 'text-red-600 dark:text-red-400';
+    WeeklyIcon = AlertTriangle;
+  } else if (weeklyQuotaPercent > 50) {
+    weeklyStatusColor = 'bg-amber-500';
+    weeklyTextColor = 'text-amber-600 dark:text-amber-400';
+    WeeklyIcon = Info;
+  } else if (weeklyQuotaPercent > 0) {
+    weeklyStatusColor = 'bg-green-500';
+    weeklyTextColor = 'text-green-600 dark:text-green-400';
+    WeeklyIcon = CheckCircle2;
   }
 
   return (
@@ -82,44 +122,91 @@ export function BurnRatePanel({
           </span>
         </div>
 
-        <div className="mt-8 space-y-3">
-          <div className="flex justify-between items-end">
-            <div className="flex items-center gap-1.5">
-              <Icon size={14} className={textColor} />
-              <span className="text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase letter-spacing-tight">
-                Session Quota
+        <div className="mt-6 space-y-4">
+          {/* Session Quota */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-end">
+              <div className="flex items-center gap-1.5">
+                <SessionIcon size={14} className={sessionTextColor} />
+                <span className="text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase letter-spacing-tight">
+                  Session Quota
+                </span>
+              </div>
+              <span className={`text-sm font-black ${sessionTextColor}`}>
+                {sessionQuotaPercent.toFixed(0)}%
               </span>
             </div>
-            <span className={`text-sm font-black ${textColor}`}>
-              {quotaPercent.toFixed(0)}%
-            </span>
+
+            <div className="w-full bg-gray-100 dark:bg-zinc-800 rounded-full h-2.5 overflow-hidden">
+              <div
+                className={`${sessionStatusColor} h-full rounded-full transition-all duration-1000 ease-out`}
+                style={{ width: `${sessionQuotaPercent}%` }}
+              />
+            </div>
+
+            <div className="flex justify-between text-[10px] font-medium">
+              <span className="text-gray-500">
+                {formatCurrency(activeBlockCost)} used
+              </span>
+              <span className="text-gray-500">
+                {formatCurrency(SESSION_COST_LIMIT)} limit
+              </span>
+            </div>
           </div>
 
-          <div className="w-full bg-gray-100 dark:bg-zinc-800 rounded-full h-3 overflow-hidden">
-            <div
-              className={`${statusColor} h-full rounded-full transition-all duration-1000 ease-out`}
-              style={{ width: `${quotaPercent}%` }}
-            />
-          </div>
+          {/* Weekly Quota */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-end">
+              <div className="flex items-center gap-1.5">
+                <WeeklyIcon size={14} className={weeklyTextColor} />
+                <span className="text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase letter-spacing-tight">
+                  Weekly Quota
+                </span>
+              </div>
+              <span className={`text-sm font-black ${weeklyTextColor}`}>
+                {weeklyQuotaPercent.toFixed(0)}%
+              </span>
+            </div>
 
-          <div className="flex justify-between text-[11px] font-medium">
-            <span className="text-gray-500">
-              {formatCurrency(activeBlockCost)} used
-            </span>
-            <span className="text-gray-500">
-              {formatCurrency(quotaLimit)} limit
-            </span>
+            <div className="w-full bg-gray-100 dark:bg-zinc-800 rounded-full h-2.5 overflow-hidden">
+              <div
+                className={`${weeklyStatusColor} h-full rounded-full transition-all duration-1000 ease-out`}
+                style={{ width: `${weeklyQuotaPercent}%` }}
+              />
+            </div>
+
+            <div className="flex justify-between text-[10px] font-medium">
+              <span className="text-gray-500">
+                {formatCurrency(totalWeeklyCost)} used
+              </span>
+              <span className="text-gray-500">
+                {formatCurrency(WEEKLY_COST_LIMIT)} limit
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-6 pt-4 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center">
+      <div className="mt-6 pt-4 border-t border-gray-100 dark:border-zinc-800 grid grid-cols-3 gap-3">
         <div className="space-y-0.5">
           <p className="text-[10px] font-bold text-gray-400 uppercase">
             Hourly Cost
           </p>
           <p className="text-sm font-bold text-gray-900 dark:text-white">
             {formatCurrency(burnRate.costPerHour)}/hr
+          </p>
+        </div>
+        <div className="text-center space-y-0.5">
+          <p className="text-[10px] font-bold text-gray-400 uppercase flex items-center justify-center gap-1">
+            <Calendar size={10} />
+            Week Reset
+          </p>
+          <p className="text-sm font-bold text-purple-600 dark:text-purple-400">
+            {daysUntilReset === 0
+              ? 'Today'
+              : daysUntilReset === 1
+                ? '1 day'
+                : `${daysUntilReset} days`}
           </p>
         </div>
         <div className="text-right space-y-0.5">
