@@ -125,7 +125,10 @@ export function AccumulatedCostChart({
                 color: isDark ? '#a1a1aa' : '#71717a',
                 marginBottom: '4px',
               }}
-              formatter={(value: any) => formatCurrency(value)}
+              formatter={(value: any, name: any) => {
+                if (name === 'accumulated_background') return null;
+                return formatCurrency(value);
+              }}
             />
             <Legend
               verticalAlign="top"
@@ -144,6 +147,9 @@ export function AccumulatedCostChart({
               stroke="none"
               fillOpacity={1}
               fill="url(#accumulatedGradient)"
+              legendType="none"
+              name="accumulated_background"
+              activeDot={false}
             />
             <Bar
               dataKey="dailyCost"

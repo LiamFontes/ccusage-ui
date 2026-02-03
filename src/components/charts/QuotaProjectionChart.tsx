@@ -59,22 +59,32 @@ export function QuotaProjectionChart({
   const msRemaining = (limit - currentCost) / costPerMs;
   const projectedEndTime = now + Math.max(0, msRemaining); // Ensure non-negative
 
-  const data = [
-    {
-      time: startTime,
-      actualCost: 0,
-      projectedCost: 0,
-    },
-    {
-      time: now,
-      actualCost: currentCost,
-      projectedCost: currentCost,
-    },
-    {
-      time: projectedEndTime,
-      projectedCost: limit,
-    },
-  ];
+  const data = [];
+  const numHistoryPoints = 12; // One point every ~5 mins for an hour
+  const numProjectionPoints = 12;
+
+  // Add history points (from startTime to now)
+  for (let i = 0; i <= numHistoryPoints; i++) {
+    const time = startTime + (now - startTime) * (i / numHistoryPoints);
+    const cost = (currentCost * i) / numHistoryPoints;
+    data.push({
+      time,
+      actualCost: cost,
+      projectedCost: cost,
+    });
+  }
+
+  // Add projection points (from now to projectedEndTime)
+  // Skip the first point since it's same as the last history point
+  for (let i = 1; i <= numProjectionPoints; i++) {
+    const time = now + (projectedEndTime - now) * (i / numProjectionPoints);
+    const cost =
+      currentCost + (limit - currentCost) * (i / numProjectionPoints);
+    data.push({
+      time,
+      projectedCost: cost,
+    });
+  }
 
   const formatTimeKey = (time: number) => {
     return new Date(time).toLocaleTimeString([], {
