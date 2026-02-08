@@ -12,7 +12,8 @@ import { AccumulatedCostChart } from '../components/charts/AccumulatedCostChart'
 import { QuotaProjectionChart } from '../components/charts/QuotaProjectionChart';
 import { LastRefreshed } from '../components/LastRefreshed';
 import { calculateTotals } from '../server/ccusage.types';
-import { SESSION_COST_LIMIT, getWeekStartDate } from '../lib/constants';
+import { getWeekStartDate } from '../lib/constants';
+import { usePlan } from '../components/PlanProvider';
 
 export const Route = createFileRoute('/')({
   component: Dashboard,
@@ -30,6 +31,9 @@ function Dashboard() {
     isLoading: isBlocksLoading,
     dataUpdatedAt: blocksUpdatedAt,
   } = useCcusageBlocks();
+
+  const { planConfig } = usePlan();
+  const sessionCostLimit = planConfig.sessionCostLimit;
 
   const totals = dailyData?.daily ? calculateTotals(dailyData.daily) : null;
   const activeBlock = blocksData?.blocks.find((block) => block.isActive);
@@ -64,7 +68,7 @@ function Dashboard() {
   ) {
     const remainingBudget = Math.max(
       0,
-      SESSION_COST_LIMIT - activeBlock.costUSD,
+      sessionCostLimit - activeBlock.costUSD,
     );
     const costBasedRemainingMinutes =
       (remainingBudget / activeBlock.burnRate.costPerHour) * 60;
@@ -202,7 +206,7 @@ function Dashboard() {
           />
           <QuotaProjectionChart
             activeBlock={activeBlock}
-            limit={SESSION_COST_LIMIT}
+            limit={sessionCostLimit}
             isLoading={isBlocksLoading}
           />
         </div>

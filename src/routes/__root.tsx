@@ -11,6 +11,8 @@ import { TanStackDevtools } from '@tanstack/react-devtools';
 
 import { ThemeProvider } from '../components/ThemeProvider';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { PlanProvider } from '../components/PlanProvider';
+import { PlanSelector } from '../components/PlanSelector';
 import {
   LayoutDashboard,
   Calendar,
@@ -57,9 +59,11 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <RootDocument>
-          <Outlet />
-        </RootDocument>
+        <PlanProvider>
+          <RootDocument>
+            <Outlet />
+          </RootDocument>
+        </PlanProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
@@ -112,7 +116,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   </Link>
                 </div>
               </div>
-              <div className="hidden sm:ml-6 sm:flex sm:items-center">
+              <div className="hidden sm:ml-6 sm:flex sm:items-center gap-3">
+                <PlanSelector />
                 <ThemeToggle />
               </div>
             </div>

@@ -8,11 +8,8 @@ import {
 } from 'lucide-react';
 import type { BurnRate } from '../../server/ccusage.types';
 import { formatCompactNumber, formatCurrency } from '../../lib/formatters';
-import {
-  SESSION_COST_LIMIT,
-  WEEKLY_COST_LIMIT,
-  getDaysUntilSunday,
-} from '../../lib/constants';
+import { getDaysUntilSunday } from '../../lib/constants';
+import { usePlan } from '../PlanProvider';
 
 interface BurnRatePanelProps {
   burnRate: BurnRate | null | undefined;
@@ -30,6 +27,10 @@ export function BurnRatePanel({
   totalWeeklyCost = 0,
   isLoading,
 }: BurnRatePanelProps) {
+  const { planConfig } = usePlan();
+  const sessionCostLimit = planConfig.sessionCostLimit;
+  const weeklyCostLimit = planConfig.weeklyCostLimit;
+
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 h-full border border-transparent">
@@ -56,11 +57,11 @@ export function BurnRatePanel({
   }
 
   const sessionQuotaPercent = Math.min(
-    (activeBlockCost / SESSION_COST_LIMIT) * 100,
+    (activeBlockCost / sessionCostLimit) * 100,
     100,
   );
   const weeklyQuotaPercent = Math.min(
-    (totalWeeklyCost / WEEKLY_COST_LIMIT) * 100,
+    (totalWeeklyCost / weeklyCostLimit) * 100,
     100,
   );
   const daysUntilReset = getDaysUntilSunday();
@@ -149,7 +150,7 @@ export function BurnRatePanel({
                 {formatCurrency(activeBlockCost)} used
               </span>
               <span className="text-gray-500">
-                {formatCurrency(SESSION_COST_LIMIT)} limit
+                {formatCurrency(sessionCostLimit)} limit
               </span>
             </div>
           </div>
@@ -180,7 +181,7 @@ export function BurnRatePanel({
                 {formatCurrency(totalWeeklyCost)} used
               </span>
               <span className="text-gray-500">
-                {formatCurrency(WEEKLY_COST_LIMIT)} limit
+                {formatCurrency(weeklyCostLimit)} limit
               </span>
             </div>
           </div>

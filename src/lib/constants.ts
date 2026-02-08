@@ -1,11 +1,34 @@
-// Session limits
-export const SESSION_COST_LIMIT = 5.62;
+export type Plan = 'pro' | 'max5x' | 'max20x';
 
-// Weekly quota limits (derived from current usage at 12%)
-// Current usage: $5.62 = 12% of weekly allotment
-// Weekly limit: $5.62 / 0.12 = $46.83
-export const WEEKLY_COST_LIMIT = 46.83;
-export const CURRENT_WEEKLY_USAGE_PERCENT = 12;
+export interface PlanConfig {
+  label: string;
+  monthlyPrice: number;
+  sessionCostLimit: number;
+  weeklyCostLimit: number;
+}
+
+export const PLAN_CONFIGS: Record<Plan, PlanConfig> = {
+  pro: {
+    label: 'Pro',
+    monthlyPrice: 20,
+    sessionCostLimit: 5.62,
+    weeklyCostLimit: 46.83,
+  },
+  max5x: {
+    label: 'Max',
+    monthlyPrice: 100,
+    sessionCostLimit: 28.1,
+    weeklyCostLimit: 234.15,
+  },
+  max20x: {
+    label: 'Max (20x)',
+    monthlyPrice: 200,
+    sessionCostLimit: 112.4,
+    weeklyCostLimit: 936.6,
+  },
+};
+
+export const DEFAULT_PLAN: Plan = 'pro';
 
 /**
  * Calculate the number of days until the next Sunday 9:00 AM ET (week reset time)
