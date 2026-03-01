@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { PLAN_CONFIGS, DEFAULT_PLAN } from '../lib/constants';
 import type { Plan, PlanConfig } from '../lib/constants';
 
@@ -29,15 +29,14 @@ export function PlanProvider({
   children,
   storageKey = 'ccusage-plan',
 }: PlanProviderProps) {
-  const [plan, setPlanState] = useState<Plan>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(storageKey);
-      if (stored && isValidPlan(stored)) {
-        return stored;
-      }
+  const [plan, setPlanState] = useState<Plan>(DEFAULT_PLAN);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(storageKey);
+    if (stored && isValidPlan(stored)) {
+      setPlanState(stored);
     }
-    return DEFAULT_PLAN;
-  });
+  }, [storageKey]);
 
   const planConfig = PLAN_CONFIGS[plan];
 
